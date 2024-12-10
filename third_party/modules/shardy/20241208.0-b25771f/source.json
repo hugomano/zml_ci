@@ -1,0 +1,8 @@
+{
+  "strip_prefix": "shardy-b25771f33b8d8e6f4eee75bf222525fb3dff455a",
+  "url": "https://github.com/openxla/shardy/archive/b25771f33b8d8e6f4eee75bf222525fb3dff455a.tar.gz",
+  "integrity": "sha256-kvTlMFaxjUeVZZuoo0bEFDMXgX5IzLN1ihoAsyNmgN4=",
+  "overlay": {
+    "MODULE.bazel": ""
+  }
+}

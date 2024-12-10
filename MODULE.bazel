@@ -88,7 +88,7 @@ use_repo(zls, "zls_aarch64-macos", "zls_x86_64-linux")
 register_toolchains("//third_party/zls:all")
 
 bazel_dep(name = "libxev", version = "20241119.0-6afcde9")
-bazel_dep(name = "llvm-raw", version = "20241022.0-6c4267f")
+bazel_dep(name = "llvm-raw", version = "20241208.0-2ccf7ed")
 
 llvm = use_extension("@llvm-raw//utils/bazel:extension.bzl", "llvm")
 llvm.configure(
@@ -100,8 +100,8 @@ llvm.configure(
 )
 use_repo(llvm, "llvm-project")
 
-bazel_dep(name = "stablehlo", version = "20241021.0-1c0b606")
-bazel_dep(name = "xla", version = "20241025.0-4663f04")
+bazel_dep(name = "stablehlo", version = "20241208.0-b44460a")
+bazel_dep(name = "xla", version = "20241208.0-fb46636")
 
 tsl = use_extension("@xla//:tsl.bzl", "tsl")
 use_repo(tsl, "tsl")
@@ -119,8 +119,9 @@ apt.install(
 )
 use_repo(apt, "neuron_bookworm")
 
-# TODO(@cryptodeal): remove
-bazel_dep(name = "googletest", version = "1.15.2")
-bazel_dep(name = "abseil-cpp", version = "20240116.0")
+#TODO(@cryptodeal): remove this once mlx plugin builds correctly
+bazel_dep(name = "googletest", version = "1.15.2", repo_name = "com_google_googletest")
+bazel_dep(name = "abseil-cpp", version = "20240116.0", repo_name = "com_google_absl")
+
 
 
