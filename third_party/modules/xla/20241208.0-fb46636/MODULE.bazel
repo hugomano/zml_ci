@@ -11,6 +11,7 @@ bazel_dep(name = "rules_apple", version = "3.2.1", repo_name = "build_bazel_rule
 bazel_dep(name = "pybind11_bazel", version = "2.13.6")
 bazel_dep(name = "snappy", version = "1.2.1")
 bazel_dep(name = "abseil-cpp", version = "20240116.0", repo_name = "com_google_absl")
+bazel_dep(name = "googletest", version = "1.15.2", repo_name = "com_google_googletest")
 bazel_dep(name = "double-conversion", version = "3.3.0", repo_name = "double_conversion")
 bazel_dep(name = "rules_python", version = "0.29.0")
 bazel_dep(name = "rules_proto", version = "6.0.0-rc1")
@@ -32,6 +33,9 @@ llvm.configure(
     ],
 )
 use_repo(llvm, "llvm-project")
+
+mlx = use_extension("//:mlx.bzl", "mlx_packages")
+use_repo(mlx, "libmlx")
 
 tsl = use_extension("//:tsl.bzl", "tsl")
 use_repo(tsl, "tsl")

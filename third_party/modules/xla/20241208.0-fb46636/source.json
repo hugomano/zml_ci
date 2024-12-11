@@ -3,12 +3,15 @@
   "url": "https://github.com/openxla/xla/archive/fb46636c1f8f88b3bd69bf0523b76c904191d1ad.tar.gz",
   "integrity": "sha256-IMUAn+ypSXOaibTwB3yqyTRbYj+vvJHxVNWQhcQZPiM=",
   "overlay": {
+    "mlx.bzl": "",
+    "libmlx.BUILD.bazel": "",
     "tsl.bzl": "",
     "workspace.bzl": "",
     "MODULE.bazel": ""
   },
   "patch_strip": 1,
   "patches": {
+    "0001-PJRT-MLX-Plugin.patch": "",
     "0003-PJRT-C-API-Ensure-C-compliance-for-Profiler-Extensio.patch": ""
   }
 }
