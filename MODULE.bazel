@@ -70,9 +70,6 @@ use_repo(cpu, "libpjrt_cpu_darwin_arm64", "libpjrt_cpu_linux_amd64")
 cuda = use_extension("//runtimes/cuda:cuda.bzl", "cuda_packages")
 use_repo(cuda, "libpjrt_cuda")
 
-mlx = use_extension("//mlx:mlx.bzl", "mlx_packages")
-use_repo(mlx, "libmlx")
-
 rocm = use_extension("//runtimes/rocm:rocm.bzl", "rocm_packages")
 use_repo(rocm, "libpjrt_rocm")
 

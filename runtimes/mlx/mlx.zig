@@ -1,6 +1,7 @@
 const builtin = @import("builtin");
 const asynk = @import("async");
 const pjrt = @import("pjrt");
+const std = @import("std");
 const c = @import("c");
 
 pub fn isEnabled() bool {
@@ -14,5 +15,5 @@ pub fn load() !*const pjrt.Api {
     if (comptime builtin.os.tag != .macos) {
         return error.Unavailable;
     }
-    return try pjrt.Api.loadFrom("libpjrt_mlx.so");
+    return pjrt.Api.loadFrom("stablehlo_mlx_plugin.so");
 }

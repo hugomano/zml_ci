@@ -37,6 +37,7 @@ copy_directory(
 cc_import(
     name = "mlx_import",
     shared_library = ":libmlx_dylib",
+    # visibility = ["@zml//runtimes/mlx:__subpackages__"],
 )
 
 cc_library(
