@@ -48,10 +48,10 @@ index 64e3552ded..2f2ef61fe0 100644
    if (client->platform_id() != CpuId()) {
 diff --git a/xla/pjrt/plugin/mlx/BUILD b/xla/pjrt/plugin/mlx/BUILD
 new file mode 100644
-index 0000000000..4bdaf2579d
+index 0000000000..29a3072ccd
 --- /dev/null
 +++ b/xla/pjrt/plugin/mlx/BUILD
-@@ -0,0 +1,170 @@
+@@ -0,0 +1,171 @@
 +load("//xla:xla.bzl", "xla_cc_binary", "xla_cc_test")
 +
 +package(
@@ -220,6 +220,7 @@ index 0000000000..4bdaf2579d
 +    linkshared = True,
 +    deps = [
 +        ":client_c_pjrt",
++        "@libmlx",
 +    ],
 +)
 \ No newline at end of file
@@ -1309,10 +1310,10 @@ index 0000000000..ef42968a3a
 \ No newline at end of file
 diff --git a/xla/pjrt/plugin/mlx/executable.cc b/xla/pjrt/plugin/mlx/executable.cc
 new file mode 100644
-index 0000000000..ffc45bcb2c
+index 0000000000..21b9c1b0a9
 --- /dev/null
 +++ b/xla/pjrt/plugin/mlx/executable.cc
-@@ -0,0 +1,383 @@
+@@ -0,0 +1,430 @@
 +/* Copyright 2024 The OpenXLA Authors.
 +Licensed under the Apache License, Version 2.0 (the "License");
 +you may not use this file except in compliance with the License.
@@ -1362,6 +1363,8 @@ index 0000000000..ffc45bcb2c
 +
 +#define DEBUG_TYPE "stablehlo-pjrt"
 +
++namespace mx = mlx::core;
++
 +namespace mlir::stablehlo {
 +
 +#define UNIMPLEMENTED(name) \
@@ -1408,13 +1411,12 @@ index 0000000000..ffc45bcb2c
 +std::optional<Operation*> getUnsupportedOp(ModuleOp module) {
 +  std::optional<Operation*> unsupported_op(std::nullopt);
 +  module.walk([&unsupported_op](Operation* op) {
-+    // only `DotGeneralOp` is supported
-+    auto cc = llvm::dyn_cast<stablehlo::DotGeneralOp>(op);
++    auto cc = llvm::dyn_cast<stablehlo::CustomCallOp>(op);
 +    if (cc) {
-+      return WalkResult::advance();
++      unsupported_op = op;
++      return WalkResult::interrupt();
 +    }
-+    unsupported_op = op;
-+    return WalkResult::interrupt();
++    return WalkResult::advance();
 +  });
 +  return unsupported_op;
 +}
@@ -1501,16 +1503,60 @@ index 0000000000..ffc45bcb2c
 +    return devices_[0]->default_memory_space().value_or(nullptr);
 +  }
 +
++  template <typename T>
++  std::vector<T> bufferAsVector(const char* buffer, unsigned size) {
++    TRACE_ME_MEMBER;
++    const T* cast_buffer = reinterpret_cast<const T*>(buffer);
++    std::vector<T> result(cast_buffer, cast_buffer + size / sizeof(T));
++    return result;
++  }
++
++  FailureOr<mx::array> arrayFromDenseElementsAttr(
++      mlir::DenseElementsAttr input) {
++    TRACE_ME_MEMBER;
++    auto input_type = input.getType();
++    std::vector<int32_t> input_shape;
++    if (input_type.hasRank()) {
++      auto shape = input_type.getShape().vec();
++      for (auto dim : shape) {
++        input_shape.emplace_back(static_cast<int32_t>(dim));
++      }
++    }
++    auto input_raw_data = input.getRawData();
++    const char* buffer_ref = input_raw_data.data();
++
++    auto element_type = input.getElementType();
++    unsigned element_width = element_type.getIntOrFloatBitWidth();
++    if (element_type.isF32()) {
++      return mx::array(reinterpret_cast<const float*>(buffer_ref), input_shape);
++    }
++    return failure();
++  }
++
 +  FailureOr<SmallVector<DenseElementsAttr>> evalModule(
 +      ModuleOp module, SmallVector<mlir::DenseElementsAttr> inputs) {
 +    TRACE_ME_MEMBER;
-+    // std::vector<mlx::core::array> res;
-+    module.walk([&inputs](Operation* op) {
-+      auto cc = llvm::dyn_cast<stablehlo::DotGeneralOp>(op);
-+      if (cc) {
-+        // res = mlx::core::tensordot();
-+        LOG(INFO) << "Evaluated DotGeneralOp\n";
++    std::vector<mx::array> mlx_inputs;
++    for (auto input : inputs) {
++      auto input_type = input.getType();
++      std::vector<int32_t> input_shape;
++      if (input_type.hasRank()) {
++        auto shape = input_type.getShape().vec();
++        for (auto dim : shape) {
++          input_shape.emplace_back(static_cast<int32_t>(dim));
++        }
 +      }
++      auto input_raw_data = input.getRawData();
++      const char* buffer_ref = input_raw_data.data();
++
++      mlx_inputs.emplace_back(
++          mx::array(reinterpret_cast<const float*>(buffer_ref), input_shape));
++    }
++    module.walk([&inputs](Operation* op) {
++      if (auto cc = llvm::dyn_cast<func::FuncOp>(op)) {
++        return WalkResult::interrupt();
++      }
++      op->dump();
 +      return WalkResult::advance();
 +    });
 +    return failure();
@@ -1528,7 +1574,9 @@ index 0000000000..ffc45bcb2c
 +      inputs.push_back(mlirArgInModuleContext);
 +    }
 +    LOG(INFO) << "EvalModule:\n" << ToString(module) << "\n";
++    printf("EvalModule:\n%s\n", ToString(module).c_str());
 +    LOG(INFO) << "Inputs: " << ToString(inputs) << "\n";
++    printf("Inputs: %s\n", ToString(inputs).c_str());
 +    FailureOr<SmallVector<DenseElementsAttr>> result =
 +        evalModule(module, inputs);
 +    if (failed(result)) {
