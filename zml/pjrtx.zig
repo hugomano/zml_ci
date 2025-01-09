@@ -86,9 +86,15 @@ pub const Client = opaque {
         return @ptrCast(buf);
     }
 
+    pub threadlocal var current_compiling_module: ?mlir.Module = null;
+
     fn compileSync(self: *const Client, api: *const Api, allocator: std.mem.Allocator, module: mlir.Module, compile_options_pb: []const u8) CompileError!*LoadedExecutable {
+        current_compiling_module = module;
+        defer current_compiling_module = null;
+
         var bytecode = std.ArrayList(u8).init(allocator);
         defer bytecode.deinit();
+
         module.op().writeBytecodeWithConfig(bytecode.writer(), .{ .desiredEmitedVersion = 1 }) catch |err| {
             log.err("failed to write module bytecode: {}", .{err});
             return err;

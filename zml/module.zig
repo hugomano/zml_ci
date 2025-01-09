@@ -184,6 +184,20 @@ pub const CompilationContext = struct {
         return self._mlir_ctx.location(src).namedFmt(self._mlir_ctx, name, args);
     }
 
+    pub fn signalHandler(_: c_int) callconv(.C) void {
+        if (_current != null) {
+            log.err("ZML crashed while emitting IR", .{});
+            return;
+        }
+        if (pjrt.Client.current_compiling_module) |module| {
+            log.err("ZML crashed inside pjrt compilation. This is the MLIR we tried to compile:", .{});
+            log.err("{}", .{module.op().mlirFormatter(.{})});
+            return;
+        }
+
+        log.err("ZML crashed outside of compilation", .{});
+    }
+
     /// Compiles the given function with the given arguments.
     /// This is the untyped API and is not meant to be use directly.
     ///
