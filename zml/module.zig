@@ -908,6 +908,7 @@ fn compileModuleToPjrtExecutable(arena: std.mem.Allocator, platform: Platform, m
     if (xla_dump_to_ orelse platform.compilation_options.xla_dump_to) |xla_dump_to| {
         setFlag(&options, "xla_dump_to", xla_dump_to);
         setFlag(&options, "xla_dump_hlo_as_dot", true);
+        setFlag(&options, "xla_dump_hlo_as_proto", true);
         if (platform.compilation_options.xla_dump_fusion_visualization) {
             setFlag(&options, "xla_dump_fusion_visualization", true);
         }
