@@ -1,0 +1,11 @@
+load("@zml//bazel:zig.bzl", "zig_cc_binary")
+
+# Executable
+zig_cc_binary(
+    name = "mlx",
+    main = "main.zig",
+    deps = [
+        "@zml//async",
+        "@zml//zml",
+    ],
+)

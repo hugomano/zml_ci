@@ -8,7 +8,10 @@ bazel_dep(name = "platforms", version = "0.0.8")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "rules_apple", version = "3.2.1", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "pybind11_bazel", version = "2.13.6")
+bazel_dep(name = "snappy", version = "1.2.1")
 bazel_dep(name = "abseil-cpp", version = "20240116.0", repo_name = "com_google_absl")
+# bazel_dep(name = "googletest", version = "1.15.2", repo_name = "com_google_googletest")
 bazel_dep(name = "rules_python", version = "0.29.0")
 bazel_dep(name = "rules_proto", version = "6.0.0-rc1")
 bazel_dep(name = "rules_java", version = "7.3.2")
@@ -18,6 +21,21 @@ bazel_dep(name = "re2", version = "2024-02-01", repo_name = "com_googlesource_co
 bazel_dep(name = "rules_license", version = "0.0.8")
 
 bazel_dep(name = "stablehlo", version = "20241220.0-38bb2f9")
+bazel_dep(name = "shardy", version = "20250102.0-2f5e924")
+bazel_dep(name = "llvm-raw", version = "20250102.0-f739aa4")
+
+# mlx dep for pjrt plugin
+bazel_dep(name = "mlx", version = "20241224.0-935c8c4")
+
+llvm = use_extension("@llvm-raw//utils/bazel:extension.bzl", "llvm")
+llvm.configure(
+    targets = [
+        "AArch64",
+        "X86",
+        "NVPTX",
+    ],
+)
+use_repo(llvm, "llvm-project")
 
 tsl = use_extension("//:tsl.bzl", "tsl")
 use_repo(tsl, "tsl")
@@ -30,5 +48,9 @@ use_repo(
     "local_config_cuda",
     "local_config_remote_execution",
     "local_config_rocm",
+    "local_config_sycl",
     "local_config_tensorrt",
+    "eigen_archive",
+    "farmhash_archive",
+    "ml_dtypes",
 )

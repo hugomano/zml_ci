@@ -98,6 +98,7 @@ const _CreateOptions = struct {
     rocm: struct {} = .{},
     tpu: struct {} = .{},
     neuron: struct {} = .{},
+    mlx: struct {} = .{},
 
     pub const Cuda = struct {
         allocator: Allocator = .{ .bfc = .{} },

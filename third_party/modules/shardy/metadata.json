@@ -1,0 +1,17 @@
+{
+  "homepage": "https://github.com/openxla/shardy",
+  "maintainers": [
+    {
+      "email": "bzlmod@zml.ai",
+      "github": "zml",
+      "name": "ZML Engineering Team"
+    }
+  ],
+  "repository": [
+    "github:openxla/shardy"
+  ],
+  "versions": [
+    "20250102.0-2f5e924"
+  ],
+  "yanked_versions": {}
+}
