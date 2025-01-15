@@ -929,6 +929,7 @@ fn compileModuleToPjrtExecutable(arena: std.mem.Allocator, platform: Platform, m
             //  setFlag(&options, "xla_gpu_enable_while_loop_double_buffering", true);
             //  setFlag(&options, "xla_gpu_use_runtime_fusion", true);
             //  setFlag(&options, "xla_gpu_enable_latency_hiding_scheduler", true);
+            setFlag(&options, "xla_gpu_force_compilation_parallelism", 8);
             var r_ = try runfiles.Runfiles.create(.{ .allocator = arena }) orelse {
                 log.warn("Bazel runfile not found !", .{});
                 break :cuda_dir;
@@ -959,8 +960,8 @@ fn compileModuleToPjrtExecutable(arena: std.mem.Allocator, platform: Platform, m
 fn setFlag(options: *xla_pb.CompileOptionsProto, comptime flag: [:0]const u8, value: anytype) void {
     const option: xla_pb.OptionOverrideProto = switch (@typeInfo(@TypeOf(value))) {
         .Bool => .{ .value = .{ .bool_field = value } },
-        .Int => .{ .value = .{ .int_field = value } },
-        .Float => .{ .value = .{ .double_field = value } },
+        .ComptimeInt, .Int => .{ .value = .{ .int_field = value } },
+        .ComptimeFloat, .Float => .{ .value = .{ .double_field = value } },
         else => .{ .value = .{ .string_field = .{ .Const = value } } },
     };
     options.env_option_overrides.appendAssumeCapacity(.{ .key = .{ .Const = flag }, .value = option });
