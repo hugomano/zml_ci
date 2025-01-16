@@ -132,7 +132,7 @@ pub fn asyncMain() !void {
         layer_start: u8 = 0,
         num_layers: ?u8 = null,
         seq_len: u32 = 256,
-        topk: u32 = 2,
+        topk: u32 = 1,
         temperature: u32 = 1,
         num_heads: ?i64 = null,
         num_kv_heads: ?i64 = null,
@@ -154,7 +154,7 @@ pub fn asyncMain() !void {
     defer context.deinit();
 
     const compilation_options = zml.CompilationOptions{
-        .xla_dump_to = "/tmp/zml/llama",
+        // .xla_dump_to = "/tmp/zml/llama",
         .sharding_enabled = true,
     };
 
