@@ -274,7 +274,7 @@ pub const Tokenizer = struct {
         else if (id == self.special_tokens.unk)
             "<unk>"
         else if (id > self.tokens.len)
-            std.debug.panic("Unexpected token id: {d}, vocab_size: {d}", .{ id, self.vocab_size })
+            "<oob>" // This is not really a token it means we received an invalid token.
         else
             self.tokens[id];
     }
