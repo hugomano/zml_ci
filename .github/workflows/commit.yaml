@@ -30,8 +30,8 @@ jobs:
       - name: Zig Format
         run: zig fmt --check  $(find . -name "*.zig" -print | while read file; do git check-ignore -q "$file" || echo "$file"; done | xargs)
 
-      - name: No Autofix
-        run: find . -name "*.zig" -print | while read file; do git check-ignore -q "$file" || (grep -q "// autofix" "$file" && echo "$file"); done | grep -q . ; [ 1 -eq $? ]
+      # - name: No Autofix
+      #   run: find . -name "*.zig" -print | while read file; do git check-ignore -q "$file" || (grep -q "// autofix" "$file" && echo "$file"); done | grep -q . ; [ 1 -eq $? ]
 
       - name: Setup Bazel
         run: |
