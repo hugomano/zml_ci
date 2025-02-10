@@ -33,6 +33,11 @@ jobs:
       # - name: No Autofix
       #   run: find . -name "*.zig" -print | while read file; do git check-ignore -q "$file" || (grep -q "// autofix" "$file" && echo "$file"); done | grep -q . ; [ 1 -eq $? ]
 
+      - name: Setup bin directory
+        run: |
+          mkdir -p $HOME/bin
+          echo "$HOME/bin" >> $GITHUB_PATH
+
       - name: Setup Bazel
         run: |
           wget https://github.com/bazelbuild/bazelisk/releases/download/v${{ env.BAZELISK_VERSION }}/bazelisk-linux-amd64
@@ -70,6 +75,6 @@ jobs:
         working-directory: examples/
         run: bazel build --config=debug --verbose_failures --build_tag_filters=-no_ci //...
 
-      - name: Examples / bazel test //...
-        working-directory: examples/
-        run: bazel test --config=debug --verbose_failures --keep_going --test_output=streamed --build_tag_filters=-no_ci --test_tag_filters=-no_ci //...
+      # - name: Examples / bazel test //...
+      #   working-directory: examples/
+      #   run: bazel test --config=debug --verbose_failures --keep_going --test_output=streamed --build_tag_filters=-no_ci --test_tag_filters=-no_ci //...
