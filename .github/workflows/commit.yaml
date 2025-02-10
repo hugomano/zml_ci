@@ -35,9 +35,9 @@ jobs:
 
       - name: Setup Bazel
         run: |
-          wget https://github.com/bazelbuild/bazelisk/releases/download/v${{ env.BAZELISK_VERSION }}/bazelisk-linux-amd64 -O ~/bin/bazel
-          chmod +x ~/bin/bazel
-          echo "$HOME/bin" >> "$GITHUB_PATH"
+          wget https://github.com/bazelbuild/bazelisk/releases/download/v${{ env.BAZELISK_VERSION }}/bazelisk-linux-amd64
+          chmod +x bazelisk-linux-amd64
+          mv bazelisk-linux-amd64 $HOME/bin/bazelisk
       
       - name: ZML / bazel mod explain
         run: bazel mod explain
